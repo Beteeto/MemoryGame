@@ -33,14 +33,14 @@
             /* Evita que la imagen se repita */
         }
 
-        #game-container,
-        #top-half,
-        #bottom-half {
+        #game-container {
+            position: absolute;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             width: 100%;
+            margin-top: 300px;
         }
 
         #game-board {
@@ -100,6 +100,12 @@
             color: white;
         }
 
+        #botones{
+            margin-right: -1425px;
+            margin-top: -95px;
+
+        }
+
         #start-button,
         #reset-button {
             font-size: 20px;
@@ -108,6 +114,7 @@
             cursor: pointer;
             border: none;
             color: white;
+            margin-right: px;
         }
 
         #start-button {
@@ -119,8 +126,6 @@
         }
 
         #crono {
-            position: fixed;
-            margin-right: 3500px;
             color: #fff;
             /* Color del texto (morado en este caso) */
             text-shadow: 0 0 5px #8a2be2, 0 0 10px #8a2be2, 0 0 20px #8a2be2;
@@ -130,15 +135,6 @@
 
         }
 
-        #score-container {
-            font-size: 18px;
-            margin-top: 20px;
-            font-size: 25px;
-
-            display: none;
-            font-family: "Vibur", sans-serif;
-
-        }
 
         #Nickname {
             margin-left: 1100px;
@@ -150,19 +146,20 @@
         }
 
         #leaderboard {
-            position: fixed;
             margin-right: 1300px;
-            margin-top: -1px;
             color: #fff;
             /* Color del texto (morado en este caso) */
             text-shadow: 0 0 5px #8a2be2, 0 0 10px #8a2be2, 0 0 20px #8a2be2;
             /* Efecto de sombra de neon en blanco */
             font-size: 25px;
             font-family: "Vibur", sans-serif;
+            
 
         }
 
         #score-container {
+            position: absolute;
+            margin-left: 1300px;
             margin-top: 130px;
             font-size: 30px;
             color: #fff;
@@ -171,11 +168,11 @@
             /* Efecto de sombra de neon en blanco */
             font-size: 25px;
             font-family: "Vibur", sans-serif;
+            
 
         }
 
         #Cartas {
-            position: fixed;
             margin-left: 1080px;
             margin-top: 100px;
             font-size: 25px;
@@ -184,28 +181,28 @@
         }
 
         #titulo {
-            position: fixed;
+            position: absolute;
+             top: 0; /* Position at the top */
+            left: 80px; /* Position at the left */            
             margin-right: 1300px;
             margin-top: 10px;
             font-size: 60px;
             font-family: "Vibur", sans-serif;
         }
 
-        #bottom-half {
-            text-align: justify;
-            margin-top: -400px;
-            margin-left: 900px;
-            font-family: "Vibur", sans-serif;
-        }
+        
 
         table {
+            position: absolute;
+            margin-bottom: 300px;
             border: 5px solid #8a2be2;
-            width: 100%;
-            font-size: 25px;
-            position: fixed;
+            width:  100%;
+            border-collapse: collapse;
+            margin-bottom: 500px;
             max-width: 500px;
-
-            font-family: "Vibur", sans-serif;
+        }
+        td {
+            border: 1px solid black;
         }
 
         th,
@@ -232,25 +229,6 @@
     </div>
     <div id="titulo">
         <label class="neonText">Memorama Musical!</label>
-    </div>
-    <div id="Nickname">
-        <label class="neonText" for="nick">Ingrese su Nickname:</label>
-        <input type="text" id="nick-input" placeholder="Nickname" name="nick" />
-        <button id="start-button">Iniciar</button>
-        <button id="reset-button">Detener Juego</button>
-    </div>
-    <div id="game-container">
-        <div id="top-half">
-            <div id="game-board"></div>
-        </div>
-        <div id="bottom-half">
-            <div id="score-container">
-                Pares Adivinados: <span id="pairs-guessed">0</span><br>
-                Pares Faltantes: <span id="pairs-remaining">0</span>
-                <div id="crono">
-                </div>
-            </div>
-        </div>
         <div id="leaderboard">
             <h2>Tabla de Puntuaciones</h2>
             <table>
@@ -264,6 +242,25 @@
                 <tbody id="scoreboard-body">
                 </tbody>
             </table>
+        </div>
+    </div>
+    <div id="Nickname">
+        <label class="neonText" for="nick">Ingrese su Nickname:</label>
+        <input type="text" id="nick-input" placeholder="Nickname" name="nick" />
+        
+    </div>
+    <div id="botones">
+        <button id="start-button">Iniciar</button>
+        <button id="reset-button">Detener Juego</button>
+    </div>
+    <div id="game-container">
+            <div id="game-board"></div>
+            <div id="score-container">
+                Pares Adivinados: <span id="pairs-guessed">0</span><br>
+                Pares Faltantes: <span id="pairs-remaining">0</span>
+                <div id="crono">
+                </div>
+            </div>
         </div>
     </div>
 
@@ -310,6 +307,8 @@
                 console.error("Error", error);
             }
             window.alert("Puntuacion enviada");
+            window.location.reload();
+
         }
         window.onload = function () {
             Score();
@@ -367,6 +366,21 @@
             }
         });
 
+        function showMoreRows() {
+    var table = document.getElementById("scoreboard-body");
+    var rows = table.getElementsByTagName("tr");
+    
+    // Cambia el número de filas a mostrar aquí
+    var numRowsToShow = 5;
+
+    for (var i = 0; i < rows.length; i++) {
+        if (i < numRowsToShow) {
+            rows[i].style.display = "table-row";
+        } else {
+            rows[i].style.display = "none";
+        }
+    }
+}
 
 
         function shuffle(array) {
