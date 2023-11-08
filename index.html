@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .neonText {
+            color: #fff;
+            text-shadow:
+                /* White glow */
+                0 0 7px #ffffff,
+                0 0 10px #fff,
+                0 0 21px #fff,
+                /* Green glow */
+                0 0 42px #0fa,
+                0 0 82px #8a2be2,
+                0 0 92px #0fa,
+                0 0 102px #8a2be2,
+                0 0 151px #0fa;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            height: 100vh;
+            background-image: url('background.jpg');
+            /* Reemplaza 'ruta-de-tu-imagen.jpg' con la ubicación de tu imagen de fondo */
+            background-size: cover;
+            /* Ajusta el tamaño de la imagen al tamaño de la ventana del navegador */
+            background-repeat: no-repeat;
+            /* Evita que la imagen se repita */
+        }
+
+        #game-container,
+        #top-half,
+        #bottom-half {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        #game-board {
+            display: none;
+            flex-wrap: wrap;
+            max-width: 600px;
+        }
+
+        .row,
+        .memory-card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .memory-card {
+            width: 100px;
+            height: 150px;
+            margin: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+            transform: rotateY(0deg);
+        }
+
+        .memory-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .memory-card.active {
+            transform: rotateY(360deg);
+        }
+
+        .memory-card.active img {
+            display: block;
+        }
+
+        .memory-card.active .card-back {
+            display: none;
+        }
+
+        .memory-card .card-back {
+            background-color: black;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        #start-button,
+        #reset-button {
+            font-size: 20px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+
+        #start-button {
+            background-color: #0074cc;
+        }
+
+        #reset-button {
+            background-color: #cc0000;
+        }
+
+        #crono {
+            position: fixed;
+            margin-right: 3500px;
+            color: #fff;
+            /* Color del texto (morado en este caso) */
+            text-shadow: 0 0 5px #8a2be2, 0 0 10px #8a2be2, 0 0 20px #8a2be2;
+            /* Efecto de sombra de neon en blanco */
+            font-size: 25px;
+            font-family: "Vibur", sans-serif;
+
+        }
+
+        #score-container {
+            font-size: 18px;
+            margin-top: 20px;
+            font-size: 25px;
+
+            display: none;
+            font-family: "Vibur", sans-serif;
+
+        }
+
+        #Nickname {
+            margin-left: 1100px;
+            margin-top: 100px;
+            font-size: 25px;
+
+            font-family: "Vibur", sans-serif;
+
+        }
+
+        #leaderboard {
+            position: fixed;
+            margin-right: 1300px;
+            margin-top: -1px;
+            color: #fff;
+            /* Color del texto (morado en este caso) */
+            text-shadow: 0 0 5px #8a2be2, 0 0 10px #8a2be2, 0 0 20px #8a2be2;
+            /* Efecto de sombra de neon en blanco */
+            font-size: 25px;
+            font-family: "Vibur", sans-serif;
+
+        }
+
+        #score-container {
+            margin-top: 130px;
+            font-size: 30px;
+            color: #fff;
+            /* Color del texto (morado en este caso) */
+            text-shadow: 0 0 5px #8a2be2, 0 0 10px #8a2be2, 0 0 20px #8a2be2;
+            /* Efecto de sombra de neon en blanco */
+            font-size: 25px;
+            font-family: "Vibur", sans-serif;
+
+        }
+
+        #Cartas {
+            position: fixed;
+            margin-left: 1080px;
+            margin-top: 100px;
+            font-size: 25px;
+            font-family: "Vibur", sans-serif;
+
+        }
+
+        #titulo {
+            position: fixed;
+            margin-right: 1300px;
+            margin-top: 10px;
+            font-size: 60px;
+            font-family: "Vibur", sans-serif;
+        }
+
+        #bottom-half {
+            text-align: justify;
+            margin-top: -400px;
+            margin-left: 900px;
+            font-family: "Vibur", sans-serif;
+        }
+
+        table {
+            border: 5px solid #8a2be2;
+            width: 100%;
+            font-size: 25px;
+            position: fixed;
+            max-width: 500px;
+
+            font-family: "Vibur", sans-serif;
+        }
+
+        th,
+        td {
+            border: 5px solid #8a2be2;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <br><br>
+    <div id="Cartas">
+        <label class="neonText" for="card-count-select">Selecciona la cantidad de cartas:</label>
+        <select id="card-count-select">
+            <option value="8">8</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="16">16</option>
+            <option value="20">20</option>
+        </select>
+    </div>
+    <div id="titulo">
+        <label class="neonText">Memorama Musical!</label>
+    </div>
+    <div id="Nickname">
+        <label class="neonText" for="nick">Ingrese su Nickname:</label>
+        <input type="text" id="nick-input" placeholder="Nickname" name="nick" />
+        <button id="start-button">Iniciar</button>
+        <button id="reset-button">Detener Juego</button>
+    </div>
+    <div id="game-container">
+        <div id="top-half">
+            <div id="game-board"></div>
+        </div>
+        <div id="bottom-half">
+            <div id="score-container">
+                Pares Adivinados: <span id="pairs-guessed">0</span><br>
+                Pares Faltantes: <span id="pairs-remaining">0</span>
+                <div id="crono">
+                </div>
+            </div>
+        </div>
+        <div id="leaderboard">
+            <h2>Tabla de Puntuaciones</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nickname</th>
+                        <th>Numero de Pares</th>
+                        <th>Segundos</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreboard-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let cards = [];
+        let flippedCards = [];
+        let pairsGuessed = 0;
+        let cardCount = 8;
+        let timerInterval;
+        let seconds = 0;
+        let minutes = 0;
+        let elapsedTime = 0;
+        const images = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png', '9.png', '10.png'];
+        let gameBoard = document.getElementById('game-board');
+        let startButton = document.getElementById('start-button');
+        let resetButton = document.getElementById('reset-button');
+        let cardCountSelect = document.getElementById('card-count-select');
+        let pairsGuessedSpan = document.getElementById('pairs-guessed');
+        let pairsRemainingSpan = document.getElementById('pairs-remaining');
+        let url = "https://memorama-ba184-default-rtdb.firebaseio.com/leaderboard";
+
+
+        async function Submmitscore(nickname, score, cardCount) {
+            let player = nickname;
+            let time = score;
+            let mode = cardCount;
+            console.log(player);
+            console.log(time);
+            console.log(mode);
+            try {
+                let jugador = {
+                    Nombre: player,
+                    Score: time,
+                    Modo: mode
+                };
+                const config = {
+                    method: 'POST',
+                    body: JSON.stringify(jugador),
+                    headers: { 'Content-type': 'application/json; charset=UTF-8' }
+                }
+                const response = await fetch(`${url}.json`, config);
+                const data = await response.json();
+            } catch (error) {
+                console.error("Error", error);
+            }
+            window.alert("Puntuacion enviada");
+        }
+        window.onload = function () {
+            Score();
+        };
+        let tid = "";
+        function Score() {
+            consultarAsync();
+        }
+        function rendertable(data) {
+            console.log(data);
+            let tbody = document.getElementById("scoreboard-body");
+            let rowHTML = "";
+            var arreglo = [];
+            var mod = [];
+            Object.keys(data).forEach(key => {
+                console.log(data[key]);
+                arreglo.push([`${data[key].Score}`, `${data[key].Nombre}`]);
+                mod.push([`${data[key].Modo}`]);
+            });
+            console.log(arreglo);
+            arreglo.sort(sortFunction);
+            for (let i = 0; i < arreglo.length; i++) {
+                rowHTML += `<tr>
+        <td>${arreglo[i][1]}</td>
+        <td>${mod[i][0]}</td>
+        <td>${arreglo[i][0]}</td>
+    </tr>`;
+            }
+            console.log(rowHTML);
+            tbody.innerHTML = rowHTML;
+            resetGame();
+        }
+
+        function sortFunction(a, b) {
+            return a[0] - b[0]; // Ordena por segundos (Segundos)
+        }
+
+        async function consultarAsync() {
+            try {
+                const response = await fetch(`${url}.json`);
+                const alumnos = await response.json();
+                rendertable(alumnos);
+                console.log("hola mundo")
+            } catch (error) {
+                console.error("Error", error);
+            }
+        }
+
+        startButton.addEventListener('click', function () {
+            const nickname = document.getElementById('nick-input').value;
+            if (nickname) {
+                createGameBoard();
+            } else {
+                alert('Por favor, ingrese un nickname antes de iniciar el juego.');
+            }
+        });
+
+
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function createCard(imageSrc) {
+            const card = document.createElement('div');
+            const cardImage = document.createElement('img');
+            card.className = 'memory-card';
+            card.addEventListener('click', function () {
+                if (flippedCards.length < 2 && !flippedCards.includes(card) && !card.classList.contains('active')) {
+                    card.classList.add('active');
+                    setTimeout(() => {
+                        flippedCards.push(card);
+
+                        if (flippedCards.length === 2) {
+                            checkMatch();
+                        }
+                    }, 250);
+                }
+            });
+
+            const cardBack = document.createElement('div');
+            cardBack.className = 'card-back';
+            card.appendChild(cardBack);
+
+            cardImage.src = imageSrc;
+            cardImage.alt = 'Memory Card';
+            card.appendChild(cardImage);
+
+            return card;
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.children[1].src === card2.children[1].src) {
+                flippedCards = [];
+                pairsGuessed += 1;
+                pairsGuessedSpan.textContent = pairsGuessed;
+                const pairsRemaining = cardCount / 2 - pairsGuessed;
+                pairsRemainingSpan.textContent = pairsRemaining;
+                if (pairsGuessed === cardCount / 2) {
+                    checkWin();
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('active');
+                    card2.classList.remove('active');
+                    flippedCards = [];
+                }, 750);
+            }
+        }
+
+        function updateTimer() {
+            seconds++;
+            if (seconds === 60) {
+                seconds = 0;
+                minutes++;
+            }
+            const formattedTime = (minutes < 10 ? "0" : "") + minutes + ":" +
+                (seconds < 10 ? "0" : "") + seconds;
+            document.getElementById("crono").classList.add("neonText");
+            document.getElementById("crono").textContent = "Tiempo: " + formattedTime;
+        }
+
+
+        function startTimer() {
+            timerInterval = setInterval(updateTimer, 1000) - 1;
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            seconds = 0;
+            minutes = 0;
+            document.getElementById("crono").textContent = "Tiempo: 00:00";
+        }
+
+        const scoreboardBody = document.getElementById('scoreboard-body');
+        const scoreboardData = [];
+
+        function updateScoreboard(nickname, score, cardCount) {
+            scoreboardData.push({ nickname, score, cardCount });
+            renderTable();
+            scoreboardData.sort((a, b) => a.score - b.score);
+            scoreboardBody.innerHTML = '';
+
+            scoreboardData.forEach(player => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${player.nickname}</td><td>${player.score}</td><td>${player.cardCount}</td>`;
+                scoreboardBody.appendChild(row);
+            });
+        }
+
+
+        function checkWin() {
+            const nickname = document.getElementById('nick-input').value;
+            alert(`¡Felicidades, ${nickname}, ganaste el juego!\nCompletaste el juego en ${minutes} minutos y ${seconds} segundos`);
+            const score = minutes * 60 + seconds;
+            Submmitscore(nickname, score, cardCountSelect.value);
+            stopTimer();
+            resetTimer();
+            elapsedTime = minutes * 60 + seconds;
+        }
+
+
+        function createGameBoard() {
+            cardCount = parseInt(cardCountSelect.value, 10);
+            const rows = Math.ceil(cardCount / 5);
+            pairsGuessed = 0;
+            pairsGuessedSpan.textContent = 0;
+            const pairsRemaining = cardCount / 2 - pairsGuessed;
+            pairsRemainingSpan.textContent = pairsRemaining;
+            shuffle(images);
+            cards = images.slice(0, cardCount / 2).concat(images.slice(0, cardCount / 2));
+            shuffle(cards);
+
+            gameBoard.innerHTML = '';
+
+            for (let i = 0; i < rows; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                for (let j = 0; j < cardCount / rows; j++) {
+                    if (cards.length > 0) {
+                        const imageSrc = cards.pop();
+                        const card = createCard(imageSrc);
+                        row.appendChild(card);
+                    }
+                }
+                gameBoard.appendChild(row);
+            }
+
+            gameBoard.style.display = 'flex';
+            startButton.style.display = 'none';
+            resetButton.style.display = 'block';
+            document.getElementById('score-container').style.display = 'block';
+            startTimer();
+        }
+
+        function resetGame() {
+            gameBoard.style.display = 'none';
+            startButton.style.display = 'block';
+            resetButton.style.display = 'none';
+            document.getElementById('score-container').style.display = 'none';
+            resetTimer();
+            pairsGuessed = 0;
+            pairsGuessedSpan.textContent = 0;
+            flippedCards = [];
+            const pairsRemaining = cardCount / 2 - pairsGuessed;
+            pairsRemainingSpan.textContent = pairsRemaining;
+
+            const cards = document.querySelectorAll('.memory-card');
+            cards.forEach(card => {
+                card.classList.remove('active');
+            });
+
+            shuffle(images);
+            cards = images.slice(0, cardCount / 2).concat(images.slice(0, cardCount / 2));
+            shuffle(cards);
+
+            for (let i = 0; i < rows; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                for (let j = 0; j < cardCount / rows; j++) {
+                    if (cards.length > 0) {
+                        const imageSrc = cards.pop();
+                        const card = createCard(imageSrc);
+                        row.appendChild(card);
+                    }
+                }
+                gameBoard.appendChild(row);
+            }
+
+            gameBoard.style.display = 'flex';
+            resetTimer();
+        }
+
+        resetButton.addEventListener('click', Score);
+
+        resetGame();
+        resetTimer();
+    </script>
+</body>
+
+</html>
